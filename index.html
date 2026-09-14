@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>memes.io</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background:
+        radial-gradient(circle at 20% 0%, rgba(124,92,255,.15), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(255,0,200,.08), transparent 30%),
+        #08090d;
+    color: white;
+    font-family: "Montserrat", sans-serif;
+    min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    background: rgba(8,9,13,.82);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    background: linear-gradient(90deg,#fff,#9d87ff);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+nav {
+    display: flex;
+    gap: 8px;
+    margin-left: 30px;
+}
+
+nav button,
+.account button {
+    border: 0;
+    background: transparent;
+    color: #aaa;
+    padding: 10px 13px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+nav button:hover,
+.account button:hover {
+    color: white;
+    background: rgba(255,255,255,.06);
+}
+
+.account {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.username-label {
+    color: #aaa;
+    font-size: 13px;
+}
+
+.primary {
+    border: 0 !important;
+    background: linear-gradient(135deg,#7c5cff,#a66cff) !important;
+    color: white !important;
+    padding: 11px 17px !important;
+    border-radius: 11px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 30px rgba(124,92,255,.22);
+}
+
+.primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+main {
+    width: min(1000px, calc(100% - 32px));
+    margin: auto;
+    padding: 45px 0 80px;
+}
+
+.hero {
+    text-align: center;
+    padding: 35px 0 50px;
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: clamp(42px, 8vw, 76px);
+    font-weight: 900;
+    letter-spacing: -4px;
+}
+
+.hero p {
+    color: #8f929c;
+    margin: 12px 0 0;
+    font-size: 16px;
+}
+
+.feed {
+    display: grid;
+    gap: 22px;
+}
+
+.post {
+    background: rgba(17,18,25,.86);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+}
+
+.post-header {
+    padding: 18px 20px 12px;
+}
+
+.post-title {
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 7px;
+}
+
+.post-user {
+    color: #8e91a0;
+    font-size: 13px;
+}
+
+.media-wrap {
+    background: #050507;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 650px;
+}
+
+.media-wrap img,
+.media-wrap video {
+    display: block;
+    max-width: 100%;
+    max-height: 650px;
+    object-fit: contain;
+}
+
+.post-actions {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255,255,255,.06);
+}
+
+.delete-btn {
+    border: 0;
+    background: rgba(255,70,90,.1);
+    color: #ff7888;
+    padding: 8px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.comments {
+    padding: 0 20px 18px;
+}
+
+.comments-title {
+    font-size: 13px;
+    color: #888b96;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.comment {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 13px;
+}
+
+.comment strong {
+    color: #b9aaff;
+    margin-right: 5px;
+}
+
+.comment-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.comment-form input {
+    flex: 1;
+}
+
+input,
+textarea {
+    width: 100%;
+    background: #11121a;
+    border: 1px solid #292b38;
+    color: white;
+    border-radius: 11px;
+    padding: 12px 13px;
+    outline: none;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #7c5cff;
+    box-shadow: 0 0 0 3px rgba(124,92,255,.1);
+}
+
+.comment-form button {
+    border: 0;
+    background: #7c5cff;
+    color: white;
+    border-radius: 11px;
+    padding: 0 15px;
+    font-weight: 800;
+}
+
+.empty {
+    text-align: center;
+    padding: 70px 20px;
+    color: #777b87;
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: #858895;
+}
+
+/* MODALS */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,.72);
+    backdrop-filter: blur(12px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-card {
+    width: min(440px,100%);
+    background: #101119;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: 0 30px 100px rgba(0,0,0,.5);
+}
+
+.modal-card h2 {
+    margin: 0 0 7px;
+    font-size: 27px;
+}
+
+.modal-card > p {
+    color: #777b88;
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+
+.form-group {
+    margin-bottom: 13px;
+}
+
+.form-group label {
+    display: block;
+    color: #a5a8b4;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 17px;
+}
+
+.modal-actions button {
+    flex: 1;
+}
+
+.secondary {
+    border: 1px solid #2a2c37;
+    background: #171820;
+    color: #aaa;
+    padding: 12px;
+    border-radius: 11px;
+    font-weight: 700;
+}
+
+.auth-message {
+    display: none;
+    margin-top: 12px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.auth-message.error {
+    display: block;
+    background: rgba(255,70,90,.1);
+    border: 1px solid rgba(255,70,90,.2);
+    color: #ff8b99;
+}
+
+.auth-message.success {
+    display: block;
+    background: rgba(70,255,150,.08);
+    border: 1px solid rgba(70,255,150,.16);
+    color: #76e7a4;
+}
+
+/* UPLOAD */
+
+.upload-box {
+    width: min(600px,100%);
+    margin: 20px auto;
+}
+
+.file-drop {
+    border: 2px dashed #343645;
+    border-radius: 17px;
+    padding: 35px 20px;
+    text-align: center;
+    color: #777b87;
+    transition: .2s;
+}
+
+.file-drop:hover {
+    border-color: #7c5cff;
+    background: rgba(124,92,255,.04);
+}
+
+.file-drop input {
+    margin-top: 15px;
+}
+
+.file-name {
+    margin-top: 10px;
+    color: #aaa;
+    font-size: 12px;
+}
+
+/* INTRO */
+
+#intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #08090d;
+    transition: opacity .7s ease, visibility .7s ease;
+}
+
+#intro.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.intro-content {
+    text-align: center;
+    animation: introPop .8s ease;
+}
+
+.intro-logo {
+    font-size: clamp(55px, 12vw, 110px);
+    font-weight: 900;
+    letter-spacing: -6px;
+    background: linear-gradient(135deg,#fff,#8b70ff,#d071ff);
+    -webkit-background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 30px rgba(124,92,255,.4));
+}
+
+.intro-tagline {
+    color: #777b87;
+    margin-top: 8px;
+}
+
+.intro-loader {
+    width: 100px;
+    height: 3px;
+    background: #20212b;
+    margin: 27px auto 0;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.intro-loader::after {
+    content: "";
+    display: block;
+    width: 40%;
+    height: 100%;
+    background: #8a6cff;
+    animation: loader 1s infinite;
+}
+
+@keyframes loader {
+    from { transform: translateX(-120%); }
+    to { transform: translateX(300%); }
+}
+
+@keyframes introPop {
+    from {
+        opacity: 0;
+        transform: scale(.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media(max-width:650px) {
+    header {
+        padding: 0 14px;
+    }
+
+    nav {
+        margin-left: 10px;
+    }
+
+    nav button {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .username-label {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- FLASHY INTRO -->
+<div id="intro">
+    <div class="intro-content">
+        <div class="intro-logo">memes.io</div>
+        <div class="intro-tagline">The internet's stupidest corner</div>
+        <div class="intro-loader"></div>
+    </div>
+</div>
+
+<header>
+    <div class="logo">memes.io</div>
+
+    <nav>
+        <button onclick="showHome()">Home</button>
+        <button id="uploadNav" class="hidden" onclick="showUpload()">Upload</button>
+    </nav>
+
+    <div class="account">
+        <span id="usernameLabel" class="username-label"></span>
+        <button id="loginBtn" onclick="openLogin()">Log in</button>
+        <button id="signupBtn" class="primary" onclick="openSignup()">Sign up</button>
+        <button id="logoutBtn" class="hidden" onclick="logout()">Log out</button>
+    </div>
+</header>
+
+<main>
+
+    <section id="homePage">
+        <div class="hero">
+            <h1>memes.io</h1>
+            <p>Upload memes. Share memes. Waste time.</p>
+        </div>
+
+        <div id="feed" class="feed">
+            <div class="loading">Loading memes...</div>
+        </div>
+    </section>
+
+    <section id="uploadPage" class="hidden">
+        <div class="hero">
+            <h1>Upload</h1>
+            <p>Give the internet something stupid.</p>
+        </div>
+
+        <div class="upload-box">
+            <div class="form-group">
+                <label>Title</label>
+                <input id="uploadTitle" type="text" placeholder="My incredibly stupid meme">
+            </div>
+
+            <div class="file-drop">
+                <div>Choose a GIF or video</div>
+                <input id="uploadFile" type="file" accept=".gif,video/*">
+                <div id="fileName" class="file-name"></div>
+            </div>
+
+            <button class="primary" style="width:100%;margin-top:15px" onclick="uploadPost()">
+                Upload Meme
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+    <div class="modal-card">
+        <h2>Welcome back</h2>
+        <p>Log into your memes.io account.</p>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input id="loginEmail" type="email" placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input id="loginPassword" type="password" placeholder="Password">
+        </div>
+
+        <div id="loginMessage" class="auth-message"></div>
+
+        <div class="modal-actions">
+            <button class="secondary" onclick="closeModals()">Cancel</button>
+            <button class="primary" onclick="login()">Log in</button>
+        </div>
+    </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div id="signupModal" class="modal">
+    <div class="modal-card">
+        <h2>Create account</h2>
+        <p>Pick a username and join memes.io.</p>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input id="signupUsername" type="text" placeholder="electricguy">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input id="signupEmail" type="email" placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input id="signupPassword" type="password" placeholder="At least 6 characters">
+        </div>
+
+        <div id="authMessage" class="auth-message"></div>
+
+        <div class="modal-actions">
+            <button class="secondary" onclick="closeModals()">Cancel</button>
+            <button class="primary" onclick="signup()">Create account</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL = "https://nrnwvrhkagvsiqeotclh.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_Wcdcu-D65J_KkGEl0ZPmDw_eCMuXJqy";
+
+const supabaseClient =
+    window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+/* =========================================================
+   AUTH MESSAGE
+   THIS FIXES:
+   ReferenceError: showAuthMessage is not defined
+========================================================= */
+
+function showAuthMessage(message, type = "error") {
+
+    const el = document.getElementById("authMessage");
+
+    if (!el) {
+        alert(message);
+        return;
+    }
+
+    el.textContent = message;
+
+    el.className = "auth-message " + type;
+
+    el.style.display = "block";
+}
+
+
+/* =========================================================
+   LOGIN MESSAGE
+========================================================= */
+
+function showLoginMessage(message, type = "error") {
+
+    const el = document.getElementById("loginMessage");
+
+    if (!el) {
+        alert(message);
+        return;
+    }
+
+    el.textContent = message;
+
+    el.className = "auth-message " + type;
+
+    el.style.display = "block";
+}
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let currentUser = null;
+let currentProfile = null;
+
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+setTimeout(() => {
+
+    const intro = document.getElementById("intro");
+
+    if (intro) {
+        intro.classList.add("hidden");
+    }
+
+}, 2300);
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+function getStorageUrl(path) {
+
+    return supabaseClient
+        .storage
+        .from("memes")
+        .getPublicUrl(path)
+        .data
+        .publicUrl;
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openLogin() {
+
+    closeModals();
+
+    document.getElementById("loginModal")
+        .classList.add("show");
+}
+
+
+function openSignup() {
+
+    closeModals();
+
+    document.getElementById("signupModal")
+        .classList.add("show");
+}
+
+
+function closeModals() {
+
+    document.querySelectorAll(".modal")
+        .forEach(modal => modal.classList.remove("show"));
+}
+
+
+/* =========================================================
+   AUTH UI
+========================================================= */
+
+function updateAuthUI() {
+
+    const loginBtn = document.getElementById("loginBtn");
+    const signupBtn = document.getElementById("signupBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const uploadNav = document.getElementById("uploadNav");
+    const usernameLabel = document.getElementById("usernameLabel");
+
+    if (currentUser) {
+
+        loginBtn.classList.add("hidden");
+        signupBtn.classList.add("hidden");
+
+        logoutBtn.classList.remove("hidden");
+        uploadNav.classList.remove("hidden");
+
+        usernameLabel.textContent =
+            currentProfile?.username
+                ? "@" + currentProfile.username
+                : "";
+
+    } else {
+
+        loginBtn.classList.remove("hidden");
+        signupBtn.classList.remove("hidden");
+
+        logoutBtn.classList.add("hidden");
+        uploadNav.classList.add("hidden");
+
+        usernameLabel.textContent = "";
+    }
+}
+
+
+/* =========================================================
+   GET PROFILE
+========================================================= */
+
+async function loadProfile() {
+
+    if (!currentUser) {
+        currentProfile = null;
+        updateAuthUI();
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (error) {
+
+        console.error("Profile error:", error);
+
+        currentProfile = null;
+
+    } else {
+
+        currentProfile = data;
+    }
+
+    updateAuthUI();
+}
+
+
+/* =========================================================
+   SIGN UP
+========================================================= */
+
+async function signup() {
+
+    const username =
+        document.getElementById("signupUsername")
+            .value
+            .trim();
+
+    const email =
+        document.getElementById("signupEmail")
+            .value
+            .trim();
+
+    const password =
+        document.getElementById("signupPassword")
+            .value;
+
+
+    /* CLEAR OLD MESSAGE */
+
+    const message = document.getElementById("authMessage");
+
+    if (message) {
+        message.style.display = "none";
+    }
+
+
+    /* VALIDATION */
+
+    if (!username) {
+
+        showAuthMessage("Please enter a username.");
+
+        return;
+    }
+
+
+    if (username.length < 3) {
+
+        showAuthMessage(
+            "Username must be at least 3 characters."
+        );
+
+        return;
+    }
+
+
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+
+        showAuthMessage(
+            "Username can only contain letters, numbers, and underscores."
+        );
+
+        return;
+    }
+
+
+    if (!email) {
+
+        showAuthMessage("Please enter your email.");
+
+        return;
+    }
+
+
+    if (!password) {
+
+        showAuthMessage("Please enter a password.");
+
+        return;
+    }
+
+
+    if (password.length < 6) {
+
+        showAuthMessage(
+            "Password must be at least 6 characters."
+        );
+
+        return;
+    }
+
+
+    /* CHECK USERNAME */
+
+    const { data: existingUsername, error: usernameError } =
+        await supabaseClient
+            .from("profiles")
+            .select("id")
+            .eq("username", username)
+            .maybeSingle();
+
+
+    if (usernameError) {
+
+        console.error(usernameError);
+
+        showAuthMessage(
+            "Couldn't check the username. Try again."
+        );
+
+        return;
+    }
+
+
+    if (existingUsername) {
+
+        showAuthMessage(
+            "That username is already taken."
+        );
+
+        return;
+    }
+
+
+    /* CREATE ACCOUNT */
+
+    const { data, error } =
+        await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+
+                data: {
+                    username: username
+                }
+
+            }
+
+        });
+
+
+    if (error) {
+
+        console.error("Signup error:", error);
+
+        showAuthMessage(error.message);
+
+        return;
+    }
+
+
+    /* GET USER */
+
+    const user = data.user;
+
+
+    if (!user) {
+
+        showAuthMessage(
+            "Account could not be created."
+        );
+
+        return;
+    }
+
+
+    /*
+       If email confirmation is OFF,
+       Supabase should give us a session immediately.
+    */
+
+    if (data.session) {
+
+        const { error: profileError } =
+            await supabaseClient
+                .from("profiles")
+                .upsert({
+
+                    id: user.id,
+
+                    username: username
+
+                });
+
+
+        if (profileError) {
+
+            console.error(
+                "Profile creation error:",
+                profileError
+            );
+
+            showAuthMessage(
+                "Account created, but your username could not be saved. Check your Supabase profile policy."
+            );
+
+            return;
+        }
+
+
+        currentUser = user;
+
+        await loadProfile();
+
+        closeModals();
+
+        alert(
+            "Account created! Welcome to memes.io, " +
+            username
+        );
+
+        showHome();
+
+        return;
+    }
+
+
+    /*
+       This usually means email confirmation
+       is still enabled in Supabase.
+    */
+
+    showAuthMessage(
+        "Account created! Check your email to confirm your account.",
+        "success"
+    );
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login() {
+
+    const email =
+        document.getElementById("loginEmail")
+            .value
+            .trim();
+
+    const password =
+        document.getElementById("loginPassword")
+            .value;
+
+
+    const message = document.getElementById("loginMessage");
+
+    if (message) {
+        message.style.display = "none";
+    }
+
+
+    if (!email || !password) {
+
+        showLoginMessage(
+            "Enter your email and password."
+        );
+
+        return;
+    }
+
+
+    const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+
+            email: email,
+
+            password: password
+
+        });
+
+
+    if (error) {
+
+        console.error("Login error:", error);
+
+        showLoginMessage(error.message);
+
+        return;
+    }
+
+
+    currentUser = data.user;
+
+    await loadProfile();
+
+    closeModals();
+
+    showHome();
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    currentUser = null;
+
+    currentProfile = null;
+
+    updateAuthUI();
+
+    showHome();
+}
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+        currentUser =
+            session?.user || null;
+
+        await loadProfile();
+
+    }
+);
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function showHome() {
+
+    document.getElementById("homePage")
+        .classList.remove("hidden");
+
+    document.getElementById("uploadPage")
+        .classList.add("hidden");
+
+    loadPosts();
+}
+
+
+function showUpload() {
+
+    if (!currentUser) {
+
+        openLogin();
+
+        return;
+    }
+
+    document.getElementById("homePage")
+        .classList.add("hidden");
+
+    document.getElementById("uploadPage")
+        .classList.remove("hidden");
+}
+
+
+/* =========================================================
+   LOAD POSTS
+========================================================= */
+
+async function loadPosts() {
+
+    const feed =
+        document.getElementById("feed");
+
+    feed.innerHTML =
+        '<div class="loading">Loading memes...</div>';
+
+
+    const { data: posts, error } =
+        await supabaseClient
+            .from("posts")
+            .select(`
+                *,
+                profiles (
+                    username
+                )
+            `)
+            .order("created_at", {
+                ascending: false
+            });
+
+
+    if (error) {
+
+        console.error("Post loading error:", error);
+
+        feed.innerHTML = `
+            <div class="empty">
+                <h3>Couldn't load memes</h3>
+                <p>${escapeHTML(error.message)}</p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    if (!posts || posts.length === 0) {
+
+        feed.innerHTML = `
+            <div class="empty">
+                <h3>No memes yet.</h3>
+                <p>Be the first person to ruin the internet.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    feed.innerHTML = "";
+
+
+    for (const post of posts) {
+
+        const username =
+            post.profiles?.username ||
+            "Unknown user";
+
+        const url =
+            getStorageUrl(post.file_path);
+
+
+        const article =
+            document.createElement("article");
+
+        article.className = "post";
+
+
+        let media = "";
+
+
+        if (post.file_type === "gif") {
+
+            media = `
+                <img
+                    src="${escapeHTML(url)}"
+                    alt="${escapeHTML(post.title)}"
+                    loading="lazy"
+                >
+            `;
+
+        } else {
+
+            media = `
+                <video
+                    src="${escapeHTML(url)}"
+                    controls
+                    preload="metadata"
+                ></video>
+            `;
+        }
+
+
+        article.innerHTML = `
+
+            <div class="post-header">
+
+                <div class="post-title">
+                    ${escapeHTML(post.title || "Untitled meme")}
+                </div>
+
+                <div class="post-user">
+                    @${escapeHTML(username)}
+                </div>
+
+            </div>
+
+            <div class="media-wrap">
+                ${media}
+            </div>
+
+            <div class="post-actions">
+
+                ${
+                    currentUser &&
+                    currentUser.id === post.user_id
+
+                    ? `
+                        <button
+                            class="delete-btn"
+                            onclick="deletePost(${post.id}, '${escapeHTML(post.file_path)}')"
+                        >
+                            Delete
+                        </button>
+                    `
+                    : ""
+                }
+
+            </div>
+
+            <div class="comments">
+
+                <div class="comments-title">
+                    COMMENTS
+                </div>
+
+                <div id="comments-${post.id}">
+                    <div class="loading">
+                        Loading comments...
+                    </div>
+                </div>
+
+                ${
+                    currentUser
+
+                    ? `
+                        <div class="comment-form">
+
+                            <input
+                                id="comment-input-${post.id}"
+                                type="text"
+                                placeholder="Say something..."
+                            >
+
+                            <button
+                                onclick="addComment(${post.id})"
+                            >
+                                Send
+                            </button>
+
+                        </div>
+                    `
+
+                    : `
+                        <div style="color:#666;font-size:12px;margin-top:10px">
+                            Log in to comment.
+                        </div>
+                    `
+                }
+
+            </div>
+        `;
+
+
+        feed.appendChild(article);
+
+        loadComments(post.id);
+    }
+}
+
+
+/* =========================================================
+   COMMENTS
+========================================================= */
+
+async function loadComments(postId) {
+
+    const container =
+        document.getElementById(
+            `comments-${postId}`
+        );
+
+    if (!container) return;
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("comments")
+            .select(`
+                *,
+                profiles (
+                    username
+                )
+            `)
+            .eq("post_id", postId)
+            .order("created_at", {
+                ascending: true
+            });
+
+
+    if (error) {
+
+        console.error(
+            "Comment error:",
+            error
+        );
+
+        container.innerHTML =
+            `<div style="color:#777;font-size:12px">
+                Couldn't load comments.
+            </div>`;
+
+        return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+        container.innerHTML =
+            `<div style="color:#666;font-size:12px">
+                No comments yet.
+            </div>`;
+
+        return;
+    }
+
+
+    container.innerHTML = data.map(comment => {
+
+        const username =
+            comment.profiles?.username ||
+            "Unknown";
+
+
+        return `
+            <div class="comment">
+
+                <strong>
+                    @${escapeHTML(username)}
+                </strong>
+
+                ${escapeHTML(comment.content)}
+
+                ${
+                    currentUser &&
+                    currentUser.id === comment.user_id
+
+                    ? `
+                        <button
+                            class="delete-btn"
+                            style="margin-left:8px"
+                            onclick="deleteComment(${comment.id}, ${postId})"
+                        >
+                            Delete
+                        </button>
+                    `
+                    : ""
+                }
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+
+/* =========================================================
+   ADD COMMENT
+========================================================= */
+
+async function addComment(postId) {
+
+    if (!currentUser) {
+
+        openLogin();
+
+        return;
+    }
+
+
+    const input =
+        document.getElementById(
+            `comment-input-${postId}`
+        );
+
+
+    const content =
+        input.value.trim();
+
+
+    if (!content) return;
+
+
+    const { error } =
+        await supabaseClient
+            .from("comments")
+            .insert({
+
+                post_id: postId,
+
+                user_id: currentUser.id,
+
+                content: content
+
+            });
+
+
+    if (error) {
+
+        alert(
+            "Couldn't add comment:\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+
+    input.value = "";
+
+    loadComments(postId);
+}
+
+
+/* =========================================================
+   DELETE COMMENT
+========================================================= */
+
+async function deleteComment(
+    commentId,
+    postId
+) {
+
+    if (!currentUser) return;
+
+
+    const { error } =
+        await supabaseClient
+            .from("comments")
+            .delete()
+            .eq("id", commentId)
+            .eq("user_id", currentUser.id);
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+    }
+
+
+    loadComments(postId);
+}
+
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+document.getElementById("uploadFile")
+    .addEventListener("change", function() {
+
+        const file = this.files[0];
+
+        document.getElementById("fileName")
+            .textContent =
+                file
+                    ? file.name
+                    : "";
+
+    });
+
+
+async function uploadPost() {
+
+    if (!currentUser) {
+
+        openLogin();
+
+        return;
+    }
+
+
+    const title =
+        document.getElementById("uploadTitle")
+            .value
+            .trim();
+
+
+    const file =
+        document.getElementById("uploadFile")
+            .files[0];
+
+
+    if (!title) {
+
+        alert("Give your meme a title.");
+
+        return;
+    }
+
+
+    if (!file) {
+
+        alert("Choose a GIF or video.");
+
+        return;
+    }
+
+
+    if (file.size > 100 * 1024 * 1024) {
+
+        alert("Maximum file size is 100 MB.");
+
+        return;
+    }
+
+
+    const isGif =
+        file.type === "image/gif" ||
+        file.name.toLowerCase().endsWith(".gif");
+
+
+    const fileType =
+        isGif
+            ? "gif"
+            : "video";
+
+
+    if (!isGif && !file.type.startsWith("video/")) {
+
+        alert("Only GIFs and videos are allowed.");
+
+        return;
+    }
+
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    const filename =
+        crypto.randomUUID() +
+        "." +
+        extension;
+
+
+    const folder =
+        `${fileType}s/${currentUser.id}/${filename}`;
+
+
+    const { error: uploadError } =
+        await supabaseClient
+            .storage
+            .from("memes")
+            .upload(folder, file, {
+                upsert: false
+            });
+
+
+    if (uploadError) {
+
+        console.error(uploadError);
+
+        alert(
+            "Upload failed:\n\n" +
+            uploadError.message
+        );
+
+        return;
+    }
+
+
+    const { error: postError } =
+        await supabaseClient
+            .from("posts")
+            .insert({
+
+                user_id: currentUser.id,
+
+                title: title,
+
+                file_path: folder,
+
+                file_type: fileType
+
+            });
+
+
+    if (postError) {
+
+        console.error(postError);
+
+        await supabaseClient
+            .storage
+            .from("memes")
+            .remove([folder]);
+
+
+        alert(
+            "Couldn't create the post:\n\n" +
+            postError.message
+        );
+
+        return;
+    }
+
+
+    document.getElementById("uploadTitle")
+        .value = "";
+
+    document.getElementById("uploadFile")
+        .value = "";
+
+    document.getElementById("fileName")
+        .textContent = "";
+
+
+    alert("Meme uploaded! 🚀");
+
+    showHome();
+}
+
+
+/* =========================================================
+   DELETE POST
+========================================================= */
+
+async function deletePost(
+    postId,
+    filePath
+) {
+
+    if (!currentUser) return;
+
+
+    if (!confirm("Delete this meme?")) {
+        return;
+    }
+
+
+    const { error: deleteError } =
+        await supabaseClient
+            .from("posts")
+            .delete()
+            .eq("id", postId)
+            .eq("user_id", currentUser.id);
+
+
+    if (deleteError) {
+
+        alert(
+            "Couldn't delete post:\n\n" +
+            deleteError.message
+        );
+
+        return;
+    }
+
+
+    await supabaseClient
+        .storage
+        .from("memes")
+        .remove([filePath]);
+
+
+    loadPosts();
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initialize() {
+
+    const {
+        data: {
+            session
+        }
+    } = await supabaseClient.auth.getSession();
+
+
+    currentUser =
+        session?.user || null;
+
+
+    await loadProfile();
+
+    updateAuthUI();
+
+    showHome();
+}
+
+
+initialize();
+
+</script>
+
+</body>
+</html>
