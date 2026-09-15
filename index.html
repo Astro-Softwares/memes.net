@@ -138,119 +138,276 @@ main {
 
 .feed {
     display: grid;
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 18px;
 }
 
 .post {
-    background: rgba(17,18,25,.86);
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 20px;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #111219;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 17px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    box-shadow: 0 15px 45px rgba(0,0,0,.2);
+    cursor: pointer;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.post:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124,92,255,.55);
+    box-shadow: 0 20px 55px rgba(0,0,0,.35);
 }
 
 .post-header {
-    padding: 18px 20px 12px;
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 55px 14px 13px;
+    background: linear-gradient(transparent, rgba(0,0,0,.9));
+    pointer-events: none;
 }
 
 .post-title {
-    font-size: 19px;
+    font-size: 14px;
     font-weight: 800;
-    margin-bottom: 7px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .post-user {
-    color: #8e91a0;
-    font-size: 13px;
+    color: #c0c2cb;
+    font-size: 11px;
 }
 
 .media-wrap {
+    position: absolute;
+    inset: 0;
     background: #050507;
     display: flex;
     justify-content: center;
     align-items: center;
-    max-height: 650px;
 }
 
 .media-wrap img,
 .media-wrap video {
+    width: 100%;
+    height: 100%;
     display: block;
-    max-width: 100%;
-    max-height: 650px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .post-actions {
-    padding: 15px 20px;
-    border-top: 1px solid rgba(255,255,255,.06);
+    position: absolute;
+    z-index: 5;
+    top: 10px;
+    right: 10px;
+    padding: 0;
+    border: 0;
+    display: flex;
+    gap: 7px;
+}
+
+.fullscreen-btn {
+    border: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: rgba(8,9,13,.75);
+    color: white;
+    font-size: 18px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 5px 20px rgba(0,0,0,.25);
+}
+
+.fullscreen-btn:hover {
+    background: #7c5cff;
 }
 
 .delete-btn {
     border: 0;
-    background: rgba(255,70,90,.1);
-    color: #ff7888;
-    padding: 8px 12px;
+    background: rgba(255,70,90,.78);
+    color: white;
+    padding: 8px 10px;
     border-radius: 9px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .comments {
-    padding: 0 20px 18px;
+    display: none;
 }
 
+.comment,
+.comment-form,
 .comments-title {
-    font-size: 13px;
-    color: #888b96;
-    margin-bottom: 10px;
-    font-weight: 700;
+    display: none;
 }
 
-.comment {
-    padding: 9px 0;
+/* FULLSCREEN VIEWER */
+
+.viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: stretch;
+    justify-content: center;
+    background: rgba(0,0,0,.92);
+    backdrop-filter: blur(16px);
+}
+
+.viewer.show {
+    display: flex;
+}
+
+.viewer-media {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 45px;
+}
+
+.viewer-media img,
+.viewer-media video {
+    max-width: 100%;
+    max-height: calc(100vh - 90px);
+    object-fit: contain;
+    border-radius: 14px;
+}
+
+.viewer-sidebar {
+    width: min(390px, 38vw);
+    min-width: 300px;
+    background: #101119;
+    border-left: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.viewer-top {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.viewer-title {
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.viewer-user {
+    color: #8e91a0;
+    font-size: 12px;
+}
+
+.viewer-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 12px;
+    background: rgba(255,255,255,.1);
+    color: white;
+    font-size: 20px;
+}
+
+.viewer-close:hover {
+    background: rgba(255,255,255,.18);
+}
+
+.viewer-comments {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+}
+
+.viewer-comments .comments-title {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.viewer-comments .comment {
+    display: block;
+    padding: 11px 0;
     border-bottom: 1px solid rgba(255,255,255,.05);
     font-size: 13px;
 }
 
-.comment strong {
+.viewer-comments .comment strong {
     color: #b9aaff;
     margin-right: 5px;
 }
 
-.comment-form {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
+.viewer-comments .comment .delete-btn {
+    margin-left: 7px;
 }
 
-.comment-form input {
+.viewer-comment-form {
+    padding: 14px 20px 20px;
+    border-top: 1px solid rgba(255,255,255,.07);
+    display: flex;
+    gap: 8px;
+}
+
+.viewer-comment-form input {
     flex: 1;
 }
 
-input,
-textarea {
-    width: 100%;
-    background: #11121a;
-    border: 1px solid #292b38;
-    color: white;
-    border-radius: 11px;
-    padding: 12px 13px;
-    outline: none;
-}
-
-input:focus,
-textarea:focus {
-    border-color: #7c5cff;
-    box-shadow: 0 0 0 3px rgba(124,92,255,.1);
-}
-
-.comment-form button {
+.viewer-comment-form button {
     border: 0;
     background: #7c5cff;
     color: white;
     border-radius: 11px;
     padding: 0 15px;
     font-weight: 800;
+}
+
+@media(max-width:800px) {
+    .feed {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .viewer {
+        overflow-y: auto;
+        flex-direction: column;
+    }
+
+    .viewer-media {
+        flex: none;
+        height: 52vh;
+        padding: 55px 18px 18px;
+    }
+
+    .viewer-media img,
+    .viewer-media video {
+        max-height: 100%;
+    }
+
+    .viewer-sidebar {
+        width: 100%;
+        min-width: 0;
+        min-height: 48vh;
+        border-left: 0;
+        border-top: 1px solid rgba(255,255,255,.08);
+    }
+}
+
+@media(max-width:430px) {
+    .feed {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .empty {
@@ -551,6 +708,30 @@ textarea:focus {
     </section>
 
 </main>
+
+<!-- FULLSCREEN MEME VIEWER -->
+<div id="viewer" class="viewer">
+    <button class="viewer-close" onclick="closeViewer()">✕</button>
+
+    <div id="viewerMedia" class="viewer-media"></div>
+
+    <aside class="viewer-sidebar">
+        <div class="viewer-top">
+            <div id="viewerTitle" class="viewer-title"></div>
+            <div id="viewerUser" class="viewer-user"></div>
+        </div>
+
+        <div id="viewerComments" class="viewer-comments">
+            <div class="comments-title">COMMENTS</div>
+            <div id="viewerCommentList"></div>
+        </div>
+
+        <div id="viewerCommentForm" class="viewer-comment-form">
+            <input id="viewerCommentInput" type="text" placeholder="Say something...">
+            <button onclick="addViewerComment()">Send</button>
+        </div>
+    </aside>
+</div>
 
 <!-- LOGIN MODAL -->
 <div id="loginModal" class="modal">
@@ -1256,7 +1437,7 @@ async function loadPosts() {
             media = `
                 <img
                     src="${escapeHTML(url)}"
-                    alt="${escapeHTML(post.title)}"
+                    alt="${escapeHTML(post.title || "Meme")}"
                     loading="lazy"
                 >
             `;
@@ -1266,7 +1447,10 @@ async function loadPosts() {
             media = `
                 <video
                     src="${escapeHTML(url)}"
-                    controls
+                    muted
+                    loop
+                    autoplay
+                    playsinline
                     preload="metadata"
                 ></video>
             `;
@@ -1274,6 +1458,10 @@ async function loadPosts() {
 
 
         article.innerHTML = `
+
+            <div class="media-wrap">
+                ${media}
+            </div>
 
             <div class="post-header">
 
@@ -1287,11 +1475,15 @@ async function loadPosts() {
 
             </div>
 
-            <div class="media-wrap">
-                ${media}
-            </div>
-
             <div class="post-actions">
+
+                <button
+                    class="fullscreen-btn"
+                    title="Open fullscreen"
+                    onclick="event.stopPropagation(); openViewer(${post.id})"
+                >
+                    📺
+                </button>
 
                 ${
                     currentUser &&
@@ -1300,7 +1492,7 @@ async function loadPosts() {
                     ? `
                         <button
                             class="delete-btn"
-                            onclick="deletePost(${post.id}, '${escapeHTML(post.file_path)}')"
+                            onclick="event.stopPropagation(); deletePost(${post.id}, '${escapeHTML(post.file_path)}')"
                         >
                             Delete
                         </button>
@@ -1309,56 +1501,337 @@ async function loadPosts() {
                 }
 
             </div>
+        `;
 
-            <div class="comments">
 
-                <div class="comments-title">
-                    COMMENTS
-                </div>
+        article.addEventListener("click", () => {
+            openViewer(post.id);
+        });
 
-                <div id="comments-${post.id}">
-                    <div class="loading">
-                        Loading comments...
-                    </div>
-                </div>
+
+        feed.appendChild(article);
+    }
+}
+
+/* =========================================================
+   FULLSCREEN MEME VIEWER
+========================================================= */
+
+let activeViewerPost = null;
+
+
+async function openViewer(postId) {
+
+    const { data: post, error } =
+        await supabaseClient
+            .from("posts")
+            .select(`
+                *,
+                profiles (
+                    username
+                )
+            `)
+            .eq("id", postId)
+            .single();
+
+
+    if (error || !post) {
+
+        console.error("Viewer error:", error);
+
+        alert(
+            "Couldn't open this meme:\n\n" +
+            (error?.message || "Meme not found.")
+        );
+
+        return;
+    }
+
+
+    activeViewerPost = post;
+
+
+    const username =
+        post.profiles?.username ||
+        "Unknown user";
+
+
+    const url =
+        getStorageUrl(post.file_path);
+
+
+    document.getElementById("viewerTitle")
+        .textContent =
+            post.title || "Untitled meme";
+
+
+    document.getElementById("viewerUser")
+        .textContent =
+            "@" + username;
+
+
+    const viewerMedia =
+        document.getElementById("viewerMedia");
+
+
+    if (post.file_type === "gif") {
+
+        viewerMedia.innerHTML = `
+            <img
+                src="${escapeHTML(url)}"
+                alt="${escapeHTML(post.title || "Meme")}"
+            >
+        `;
+
+    } else {
+
+        viewerMedia.innerHTML = `
+            <video
+                src="${escapeHTML(url)}"
+                controls
+                autoplay
+                playsinline
+            ></video>
+        `;
+    }
+
+
+    const viewer =
+        document.getElementById("viewer");
+
+    viewer.classList.add("show");
+
+    document.body.style.overflow = "hidden";
+
+
+    const commentForm =
+        document.getElementById("viewerCommentForm");
+
+
+    if (currentUser) {
+        commentForm.style.display = "flex";
+    } else {
+        commentForm.style.display = "none";
+    }
+
+
+    document.getElementById("viewerCommentInput")
+        .value = "";
+
+
+    await loadViewerComments(postId);
+}
+
+
+function closeViewer() {
+
+    const viewer =
+        document.getElementById("viewer");
+
+    viewer.classList.remove("show");
+
+    document.body.style.overflow = "";
+
+
+    document.getElementById("viewerMedia")
+        .innerHTML = "";
+
+
+    activeViewerPost = null;
+}
+
+
+async function loadViewerComments(postId) {
+
+    const container =
+        document.getElementById("viewerCommentList");
+
+
+    container.innerHTML =
+        '<div class="loading" style="padding:20px">Loading comments...</div>';
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("comments")
+            .select(`
+                *,
+                profiles (
+                    username
+                )
+            `)
+            .eq("post_id", postId)
+            .order("created_at", {
+                ascending: true
+            });
+
+
+    if (error) {
+
+        console.error(
+            "Viewer comment error:",
+            error
+        );
+
+        container.innerHTML =
+            `<div style="color:#777;font-size:12px">
+                Couldn't load comments.
+            </div>`;
+
+        return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+        container.innerHTML =
+            `<div style="color:#666;font-size:12px">
+                No comments yet. Be the first!
+            </div>`;
+
+        return;
+    }
+
+
+    container.innerHTML = data.map(comment => {
+
+        const username =
+            comment.profiles?.username ||
+            "Unknown";
+
+
+        return `
+            <div class="comment">
+
+                <strong>
+                    @${escapeHTML(username)}
+                </strong>
+
+                ${escapeHTML(comment.content)}
 
                 ${
-                    currentUser
+                    currentUser &&
+                    currentUser.id === comment.user_id
 
                     ? `
-                        <div class="comment-form">
-
-                            <input
-                                id="comment-input-${post.id}"
-                                type="text"
-                                placeholder="Say something..."
-                            >
-
-                            <button
-                                onclick="addComment(${post.id})"
-                            >
-                                Send
-                            </button>
-
-                        </div>
+                        <button
+                            class="delete-btn"
+                            onclick="deleteViewerComment(${comment.id}, ${postId})"
+                        >
+                            Delete
+                        </button>
                     `
-
-                    : `
-                        <div style="color:#666;font-size:12px;margin-top:10px">
-                            Log in to comment.
-                        </div>
-                    `
+                    : ""
                 }
 
             </div>
         `;
 
-
-        feed.appendChild(article);
-
-        loadComments(post.id);
-    }
+    }).join("");
 }
+
+
+async function addViewerComment() {
+
+    if (!currentUser) {
+
+        openLogin();
+
+        return;
+    }
+
+
+    if (!activeViewerPost) return;
+
+
+    const input =
+        document.getElementById(
+            "viewerCommentInput"
+        );
+
+
+    const content =
+        input.value.trim();
+
+
+    if (!content) return;
+
+
+    const { error } =
+        await supabaseClient
+            .from("comments")
+            .insert({
+
+                post_id: activeViewerPost.id,
+
+                user_id: currentUser.id,
+
+                content: content
+
+            });
+
+
+    if (error) {
+
+        alert(
+            "Couldn't add comment:\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+
+    input.value = "";
+
+    await loadViewerComments(
+        activeViewerPost.id
+    );
+}
+
+
+async function deleteViewerComment(
+    commentId,
+    postId
+) {
+
+    if (!currentUser) return;
+
+
+    const { error } =
+        await supabaseClient
+            .from("comments")
+            .delete()
+            .eq("id", commentId)
+            .eq("user_id", currentUser.id);
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+    }
+
+
+    await loadViewerComments(postId);
+}
+
+
+/* Press Escape to close the viewer */
+
+document.addEventListener("keydown", event => {
+
+    if (
+        event.key === "Escape" &&
+        document.getElementById("viewer")
+            .classList.contains("show")
+    ) {
+
+        closeViewer();
+    }
+});
+
 
 
 /* =========================================================
